@@ -1,5 +1,5 @@
 ========
-Hobo
+Capri
 ========
 
 Capri builds on Hobo(https://github.com/stucchio/Hobo) and provides text search in addition to the filtering that Hobo already provides.
