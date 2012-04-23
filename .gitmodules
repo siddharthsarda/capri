@@ -1,0 +1,3 @@
+[submodule "dependencies/hobo"]
+	path = dependencies/hobo
+	url = git://github.com/stucchio/Hobo.git

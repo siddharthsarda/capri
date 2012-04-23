@@ -1,0 +1,94 @@
+<project name="hobo" default="tserver" basedir=".">
+  <description>Capri</description>
+
+  <property name="src" location="src" />
+  <property name="gen" location="gen-java" />
+  <property name="build" location="build/classes" />
+  <!--<property name="junit" location="build/classes" />
+  <property name="testdir" location="test" />
+  <property name="benchdir" location="benchmarks" />-->
+
+  <path id="classpath">
+    <fileset dir="/usr/local/lib/" includes="libthrift-0.8.0.jar" />
+    <fileset dir="/usr/local/lib/" includes="slf4j-api-1.5.8.jar"/>
+    <fileset dir="/usr/local/lib/" includes="slf4j-log4j12-1.5.8.jar"/>
+    <fileset dir="/usr/local/lib/" includes="log4j-1.2.14.jar"/>
+    <fileset dir="lib/" includes="*.*"/>
+  </path>
+<!--
+  <path id="test.classpath">
+    <path refid="classpath" />
+    <fileset dir="/usr/local/lib/" includes="junit-4.4.jar"/>
+  </path>
+
+  <path id="junit.classpath">
+    <path refid="test.classpath" />
+    <fileset dir="build" includes="hobo.jar"/>
+    <pathelement path="build/classes" />
+  </path>
+-->
+  <target name="init">
+    <tstamp />
+    <mkdir dir="${build}"/>
+  </target>
+
+  <!-- Python Code -->
+  <target name="python" depends="init">
+    <exec executable="thrift"> <arg value="--gen"/> <arg value="py"/> <arg value="capri.thrift"/> </exec>
+    <exec executable="tar"> <arg value="czf"/> <arg value="build/python-capri.tgz"/> <arg value="-c"/> <arg value="gen-py"/> </exec>
+    <!--<delete dir="gen-py"/>-->
+  </target>
+
+  <target name="thriftcode" depends="init">
+    <exec executable="thrift"> <arg value="--gen"/> <arg value="java"/> <arg value="capri.thrift"/> </exec>
+  </target>
+
+  <target name="compile" depends="init,thriftcode">
+    <javac srcdir="${gen}" destdir="${build}" classpathref="classpath" >
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" >
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+    <delete dir="gen-java"/>
+  </target>
+
+  <!-- JAR -->
+  <target name="jar" depends="compile">
+    <jar jarfile="build/capri.jar" basedir="${build}"/>
+  </target>
+  <!-- Benchmarks -->
+<!--  <target name="compile-benchmarks" depends="init,thriftcode,jar">
+    <javac srcdir="${benchdir}" destdir="${build}" classpathref="test.classpath" debug="on">
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+  </target>
+-->
+
+  <!-- Unit Tests -->
+<!--  <target name="compile-test" depends="init,thriftcode">
+    <javac srcdir="${testdir}" destdir="${build}" classpathref="test.classpath" debug="on">
+      <compilerarg value="-Xlint:deprecation"/>
+    </javac>
+  </target>
+
+  <target name="test" depends="jar,compile-test">
+    <junit printsummary="yes" haltonfailure="yes" >
+      <classpath refid="junit.classpath"/>
+      <formatter type="plain" usefile="false" />
+      <batchtest fork="yes" >
+	<fileset dir="${testdir}">
+	  <include name="**/*Test*.java"/>
+	</fileset>
+      </batchtest>
+    </junit>
+  </target>
+-->
+
+  <!-- Clean -->
+  <target name="clean">
+    <delete dir="${build}" />
+    <delete file="tserver.jar" />
+  </target>
+
+</project>
